@@ -7,7 +7,6 @@ from quiz.validation import is_valid_username, is_valid_answer_index
 QUESTIONS_FILE = "data/questions.csv"
 RESULTS_FILE = "data/results.csv"
 
-
 # Helper function to initialize quiz
 def initialise_quiz():
     questions = DataManager.load_questions_from_csv(QUESTIONS_FILE)
@@ -29,6 +28,8 @@ if "answer_submitted" not in st.session_state:
     st.session_state.answer_submitted = False
 if "feedback" not in st.session_state:
     st.session_state.feedback = ""
+if "results_saved" not in st.session_state:
+    st.session_state.results_saved = False
 
 # Username input before quiz starts
 if not st.session_state.started:
@@ -86,17 +87,20 @@ else:
                 f"Final Score: {results['score']} / {results['total_questions']}"
             )
 
-            # Save results
-            DataManager.save_results_to_csv(
-                RESULTS_FILE,
-                st.session_state.username,
-                results["score"],
-                results["total_questions"],
-            )
+            # Save results only once
+            if not st.session_state.results_saved:
+                DataManager.save_results_to_csv(
+                    RESULTS_FILE,
+                    st.session_state.username,
+                    results["score"],
+                    results["total_questions"],
+                )
+                st.session_state.results_saved = True
 
-            # Optional restart
-            if st.button("Restart Quiz"):
-                st.session_state.started = False
-                st.session_state.quiz = None
-                st.session_state.feedback = ""
-                st.session_state.answer_submitted = False
+    # Optional restart
+    if st.button("Restart Quiz"):
+        st.session_state.started = False
+        st.session_state.quiz = None
+        st.session_state.feedback = ""
+        st.session_state.answer_submitted = False
+        st.session_state.results_saved = False
