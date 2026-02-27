@@ -20,48 +20,34 @@ The interface follows a linear, controlled progression designed to guide partici
 
 Welcome → Question → Feedback → Completion (Pass) / Completion (Fail)
 
-The wireframes were used to plan layout structure, validation points, conditional rendering, and navigation flow prior to implementation. They focus on screen hierarchy, interaction sequencing, and user experience design rather than final visual styling.
-
-Each screen corresponds to a distinct phase in the application logic, where progression is triggered only by defined user actions (for example, submitting an answer). This approach ensures predictable behaviour, prevents uncontrolled navigation, and maintains logical consistency throughout the quiz process.
-
 ![Figure 1: Overall GUI Design](images/overall-gui-design.png)
 
 **Figure 1: Overall GUI Design**
 
-The Welcome screen serves as the entry point to the quiz and establishes the controlled, linear workflow of the MVP. The user is presented with a minimalist interface containing a single input field prompting them to enter their name. This stage ensures that every quiz attempt is associated with an identifiable participant, supporting later analytics and CSV‑based result logging.
-Input validation occurs before progression: the system checks for empty values or invalid characters via pure validation functions in the backend. The “Start Quiz” CTA (Call to Action) remains the only actionable element on the screen, reinforcing a clear single‑step onboarding process. Supplemental details such as estimated completion time and number of questions are included to set expectations and improve usability. The overall purpose of this screen is to commit the user into a structured session and initialise their quiz state before revealing any questions.
+The Welcome screen serves as the entry point to the quiz and introduces the linear workflow. It contains a single input field for entering a name and a clear “Start Quiz” call‑to‑action. Input validation ensures that only valid names progress, supporting accurate result logging. Additional contextual details—such as estimated completion time—help set user expectations. This screen initialises the quiz state and prepares the participant for the assessment.
 
 ![Figure 2: Welcome Page](images/welcome-page.png)
 
 **Figure 2: Welcome Page**
 
-The Question screen is the core interaction layer where users engage with the multiple‑choice content. It displays a single question at a time along with four possible answers, ensuring a cognitively manageable layout aligned with common assessment UI patterns.
-A progress indicator at the top (e.g., 1/10) helps orient the user and establishes forward momentum. Users must select exactly one option before proceeding, preventing incomplete submissions. The “Submit Answer” button triggers the backend logic that evaluates correctness, logs the attempt in memory, and locks the UI to prevent answer changes.
-This screen is designed with visual hierarchy in mind: the question text is prominent, answer options are clearly spaced, and the submission action is positioned at the bottom to encourage top‑to‑bottom reading flow. This supports accessibility, reduces confusion, and standardises behaviour across all questions.
-
+The Question screen forms the main interaction stage, displaying one multiple‑choice question at a time to maintain cognitive clarity. A progress indicator (e.g., 1/10) helps orient users, while the structured layout prioritises readability and accessibility. Users must select a single answer before submitting, at which point the application evaluates correctness and locks the selection to preserve assessment integrity.
 ![Figure 3: Question Page](images/questions.png)
 
 **Figure 3: Question Page**
 
-After a user submits their answer, the interface transitions into the Feedback state. This screen replaces the “Submit Answer” button with instant correctness feedback, reinforcing learning by confirming whether the selection was right or wrong.
-The correct option is highlighted, and an explanatory message is displayed to contextualise the answer. This is important in an enterprise learning setting where the goal is not just assessment, but knowledge reinforcement. This pedagogical design helps new IBM hires understand why a particular answer is correct, supporting better long‑term retention of Data & AI concepts.
-A “Next Question” button becomes available and is the only navigation mechanism, ensuring orderly progression. This state change embodies the quiz’s controlled sequential architecture: users cannot skip ahead, revisit previous questions, or modify answers once submitted.
+After submission, the interface transitions to Feedback mode. This screen highlights the correct answer and provides explanatory text, reinforcing learning and supporting knowledge retention—particularly important in a training context. A single “Next Question” button ensures controlled, sequential progression without skipping or revisiting earlier questions.
 
 ![Figure 4: Feedback Page](images/feedback.png)
 
 **Figure 4: Feedback Page**
 
-If the user finishes the quiz with a score below the 70% passing threshold, the system transitions to the Fail screen. This view communicates the outcome clearly with large, centralised score formatting and a summarising message explaining that the pass mark has not been met.
-The design avoids punitive phrasing; instead, it takes a constructive, encouraging tone appropriate for professional training environments. A single “Restart Quiz” button is provided to allow users to immediately retry. No alternative paths (e.g., certificate generation) are presented, maintaining logical alignment with the pass/fail conditions.
-This screen also marks the end of the state machine for unsuccessful attempts and signals the conclusion of the assessment loop.
+If the participant scores below the 70% pass threshold, the Fail screen appears. It communicates the score clearly and uses supportive wording appropriate for a training environment. A “Restart Quiz” option allows the user to immediately attempt the assessment again. This screen represents the final state for unsuccessful quiz attempts.
 
 ![Figure 5: Completion Page - Fail](images/failed.png)
 
 **Figure 5: Completion Page - Fail**
 
-Users who score 70% or higher are redirected to the Pass screen. Visually similar to the Fail screen for consistency, this screen includes congratulatory messaging and emphasises successful completion with the prominently displayed score.
-An additional CTA, “View Certificate”,  appears only on this screen. This conditional UI feature introduces a differentiated end state for successful participants and demonstrates the MVP’s capacity for role‑appropriate branching logic.
-As with all previous screens, a “Restart Quiz” option remains available, supporting iterative learning or re-practice.
+Participants who achieve 70% or above are shown the Pass screen. It mirrors the Fail layout for consistency but includes a congratulatory message and a “View Certificate” option available only to successful users. A “Restart Quiz” button remains present to support repeated practice.
 
 ![Figure 6: Completion Page - Pass](images/congrats.png)
 
@@ -108,23 +94,20 @@ As with all previous screens, a “Restart Quiz” option remains available, sup
 
 ### Tech Stack
 
-- [Python 3.x](https://docs.python.org/3/) - used as the core programming language for implementing quiz logic, data validation, scoring, and file handling. Python was chosen for its readability, strong ecosystem, and ease of writing testable, modular code.
+- [Python 3.x](https://docs.python.org/3/) - core programming language.
   
-- [Streamlit](https://streamlit.io/) - used to build the graphical user interface (GUI). Streamlit enables rapid development of interactive, web‑based applications with minimal boilerplate. It handles UI rendering, session state, button logic, and page transitions for the quiz.
+- [Streamlit](https://streamlit.io/) - used to build the graphical user interface (GUI).
 
-- [pytest](https://docs.pytest.org/) - used as the testing framework for automated unit tests. This ensures pure functions such as input validation, scoring, and question progression behave deterministically and can be verified during development.
+- [pytest](https://docs.pytest.org/) - used as the testing framework.
 
-- [CSV file](https://docs.python.org/3/library/csv.html) - used for lightweight, infrastructure‑free persistence. The quiz writes participant results (name, score, timestamp) to a CSV file, which can be opened using standard tools such as Excel and supports easy inspection and analysis.
+- [CSV file](https://docs.python.org/3/library/csv.html) - used for lightweight, infrastructure‑free persistence. 
+- [Python Standard Library (csv, datetime, logging)](https://docs.python.org/3/library/index.html) - used for reading/writing CSVs, timestamping quiz attempts, and providing minimal internal logging for debugging.
 
-- [Python Standard Library (csv, datetime, logging)](https://docs.python.org/3/library/index.html) - used for reading/writing CSVs, timestamping quiz attempts, and providing minimal internal logging for debugging. These built‑in modules keep the project dependency‑light.
-
-- [Git](https://git-scm.com/) - used to track changes, manage iterations of the MVP, and ensure a maintainable development workflow.
+- [Git](https://git-scm.com/) - used for version control.
 
 ### Code Design
 
 #### Class Diagram
-
-The class diagram illustrates the modular structure of the application, showing how the Quiz class coordinates question progression and scoring, the Question class encapsulates individual question logic, the DataManager handles result persistence, and validation functions enforce input integrity, ensuring clear separation of responsibilities across the system.
 
 ```mermaid
 classDiagram
@@ -162,6 +145,220 @@ Quiz --> DataManager
 Validation ..> Quiz
 ```
 ## Development
+
+### Question Class
+
+```
+class Question:
+    # Represents a single quiz question with multiple-choice answers.
+
+    def __init__(
+        self,
+        text: str,
+        options: List[str],
+        correct_index: int,
+        feedback_correct: str,
+        feedback_incorrect: str
+    ) -> None:
+        self.text = text
+        self.options = options
+        self.correct_index = correct_index
+        self.feedback_correct = feedback_correct
+        self.feedback_incorrect = feedback_incorrect
+
+    def is_correct(self, answer_index: int) -> bool:
+        # Check whether the given answer index is correct.
+
+        return answer_index == self.correct_index
+
+    def get_feedback(self, is_correct: bool) -> str:
+        # Return feedback based on whether the answer was correct.
+
+        return self.feedback_correct if is_correct else self.feedback_incorrect
+```
+The constructor initialises all attributes required for both validation and user feedback. Storing feedback within the object ensures that explanatory messaging remains directly associated with the relevant question, rather than being managed externally.
+
+The `is_correct` method performs a deterministic comparison between the selected answer index and the stored correct index. Using an integer index avoids string comparison errors and simplifies evaluation logic.
+
+The `get_feedback` method returns contextual feedback based on the correctness of the response. By encapsulating feedback selection within the class, presentation logic in the user interface layer remains simplified and does not need to interpret correctness rules.
+
+### Quiz Class
+
+```python
+def __init__(self, questions: List[Question]) -> None:
+    self.questions = questions
+    self.current_index = 0
+    self.score = 0
+    self.user_answers: Dict[int, int] = {}
+```
+The constructor receives a list of `Question` objects, reinforcing modularity by separating question data from quiz control logic.
+
+Four core attributes are initialised:
+
+- `questions`: stores the ordered list of quiz questions  
+- `current_index`: tracks the participant’s current position  
+- `score`: maintains the number of correct responses  
+- `user_answers`: records the selected answer index for each question  
+
+The `user_answers` dictionary allows responses to be tracked by question index, which supports future extensibility such as review functionality or analytics.
+
+```python
+def get_current_question(self) -> Question:
+    return self.questions[self.current_index]
+```
+This method abstracts direct list indexing and ensures that external components do not manipulate internal state directly. By encapsulating question retrieval, the class preserves control over progression logic and reduces the risk of inconsistent access.
+
+```python
+def submit_answer(self, answer_index: int) -> bool:
+    question = self.get_current_question()
+    is_correct = question.is_correct(answer_index)
+
+    self.user_answers[self.current_index] = answer_index
+
+    if is_correct:
+        self.score += 1
+
+    return is_correct
+```
+The `submit_answer` method delegates correctness evaluation to the `Question` object, preserving separation of concerns.
+
+The selected answer index is stored in the `user_answers` dictionary using the current question index as the key. This ensures that each response is explicitly recorded.
+
+If the answer is correct, the cumulative score is incremented. The method returns a boolean value indicating correctness, enabling the user interface layer to render feedback without recalculating validation logic.
+
+```python
+def next_question(self) -> None:
+    if self.has_next_question():
+        self.current_index += 1
+```
+Progression through the quiz is controlled via the `next_question` method. Rather than incrementing the index directly, the method checks whether another question exists before advancing. This prevents out-of-range errors and ensures safe navigation.
+
+```python
+def has_next_question(self) -> bool:
+    return self.current_index < len(self.questions) - 1
+```
+The `has_next_question` method determines whether additional questions remain. Separating this boundary check into a dedicated method improves readability, reduces duplication, and supports targeted unit testing of progression logic.
+
+```python
+def get_results_summary(self) -> dict:
+    return {
+        "score": self.score,
+        "total_questions": len(self.questions),
+    }
+```
+The `get_results_summary` method provides a structured representation of the final quiz outcome. Returning a dictionary rather than raw values ensures that result data can be easily consumed by the presentation layer or persistence component.
+
+### DataManager Class
+
+```python
+@staticmethod
+def load_questions_from_csv(filepath: str) -> List[Question]:
+    questions: List[Question] = []
+
+    with open(filepath, newline="", encoding="utf-8") as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        required_fields = {
+            "question",
+            "option1",
+            "option2",
+            "option3",
+            "option4",
+            "correct_index",
+            "feedback_correct",
+            "feedback_incorrect",
+        }
+
+        if not required_fields.issubset(reader.fieldnames or []):
+            raise ValueError("CSV file is missing required columns.")
+
+        for row in reader:
+            try:
+                options = [
+                    row["option1"],
+                    row["option2"],
+                    row["option3"],
+                    row["option4"],
+                ]
+
+                question = Question(
+                    text=row["question"],
+                    options=options,
+                    correct_index=int(row["correct_index"]),
+                    feedback_correct=row["feedback_correct"],
+                    feedback_incorrect=row["feedback_incorrect"],
+                )
+
+                questions.append(question)
+
+            except (KeyError, ValueError) as error:
+                raise ValueError(f"Invalid row in CSV file: {row}") from error
+
+    return questions
+```
+The `load_questions_from_csv` method reads structured question data using `csv.DictReader`, allowing each row to be accessed by column name rather than index position. This improves readability and reduces coupling to column order.
+
+Before processing begins, the method verifies that all required fields are present in the CSV header. This validation step prevents malformed input files from being silently accepted and ensures structural integrity.
+
+For each row, a `Question` object is instantiated dynamically. Converting `correct_index` to an integer enforces type consistency. If any row contains invalid or missing data, a descriptive `ValueError` is raised, preventing corrupted question objects from entering the system.
+
+
+```python
+@staticmethod
+def save_results_to_csv(
+    filepath: str,
+    username: str,
+    score: int,
+    total_questions: int
+) -> None:
+
+    file_exists = False
+
+    try:
+        with open(filepath, "r", encoding="utf-8"):
+            file_exists = True
+    except FileNotFoundError:
+        file_exists = False
+
+    with open(filepath, "a", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+
+        if not file_exists:
+            writer.writerow(["username", "score", "total_questions"])
+
+        writer.writerow([username, score, total_questions])
+```
+The `save_results_to_csv` method appends quiz outcomes to a results file. Before writing, it checks whether the file already exists. If the file is being created for the first time, a header row is written to maintain structural consistency.
+
+The file is opened in append mode (`"a"`), ensuring that previous results are preserved rather than overwritten. Each submission records the participant’s username, their score, and the total number of questions.
+
+### Validation Utilities
+
+```python
+def is_valid_username(username: str) -> bool:
+    if not username:
+        return False
+
+    if len(username.strip()) < 2:
+        return False
+
+    return username.replace(" ", "").isalnum()
+```
+The `is_valid_username` function enforces three validation rules:
+
+1. The input must not be empty.  
+2. After trimming whitespace, it must contain at least two characters.  
+3. It must consist only of alphanumeric characters (spaces are permitted but ignored for validation).
+
+```python
+def is_valid_answer_index(index: int, num_options: int) -> bool:
+    if not isinstance(index, int):
+        return False
+
+    return 0 <= index < num_options
+```
+The `is_valid_answer_index` function ensures that submitted answers fall within the valid range of available options. The type check prevents non-integer values from being evaluated, while the boundary condition guarantees that the index does not exceed the number of options.
+
 
 ## Testing
 
