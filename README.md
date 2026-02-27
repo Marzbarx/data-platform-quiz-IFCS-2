@@ -31,6 +31,7 @@ The Welcome screen serves as the entry point to the quiz and introduces the line
 **Figure 2: Welcome Page**
 
 The Question screen forms the main interaction stage, displaying one multiple‑choice question at a time to maintain cognitive clarity. A progress indicator (e.g., 1/10) helps orient users, while the structured layout prioritises readability and accessibility. Users must select a single answer before submitting, at which point the application evaluates correctness and locks the selection to preserve assessment integrity.
+
 ![Figure 3: Question Page](images/questions.png)
 
 **Figure 3: Question Page**
@@ -359,12 +360,73 @@ def is_valid_answer_index(index: int, num_options: int) -> bool:
 ```
 The `is_valid_answer_index` function ensures that submitted answers fall within the valid range of available options. The type check prevents non-integer values from being evaluated, while the boundary condition guarantees that the index does not exceed the number of options.
 
+### Streamlit Application Layer
+
+```python
+# Quiz in progress
+quiz: Quiz = st.session_state.quiz
+question = quiz.get_current_question()
+
+selected_option = st.radio(
+    "Choose an answer:",
+    options=list(range(len(question.options))),
+    format_func=lambda i: question.options[i],
+    key=f"question_{quiz.current_index}",
+)
+
+if st.button("Submit Answer") and not st.session_state.answer_submitted:
+    if is_valid_answer_index(selected_option, len(question.options)):
+        is_correct = quiz.submit_answer(selected_option)
+        st.session_state.feedback = question.get_feedback(is_correct)
+        st.session_state.answer_submitted = True
+
+if st.session_state.answer_submitted:
+    st.info(st.session_state.feedback)
+
+    if quiz.has_next_question():
+        if st.button("Next Question"):
+            quiz.next_question()
+            st.session_state.answer_submitted = False
+```
+
+The `initialise_quiz()` helper function loads validated `Question` objects from CSV and constructs a `Quiz` instance. User input is validated before quiz initialisation using pure functions. During quiz progression, answer submission delegates correctness checks to the `Quiz` class, and contextual feedback is rendered dynamically. Results are written to CSV only once per completion cycle, preventing duplicate persistence. This design ensures clear separation between UI rendering and business logic.
 
 ## Testing
 
+Automated unit tests were implemented using `pytest` to verify deterministic behaviour of core components. The `Question` and `Quiz` classes were tested for correct answer evaluation, score calculation, and progression boundaries. Validation functions were tested independently to confirm correct handling of invalid usernames and out-of-range indices. By isolating logic from the interface layer, these components could be tested without Streamlit dependencies, improving reliability and maintainability.
+
+![Figure 7: Passing tests using pytest](images/pytest.png)
+
+**Figure 7: Passing tests using pytest**
+
 ## Documentation
 
+### End-User Documentation
+
+The quiz application is designed for internal IBM staff onboarding within the Data and AI Platform. To use the application, staff launch the Streamlit interface and enter their name on the welcome screen.
+
+### Technical Documentation
+
+To run the application locally, users must install dependencies listed in `requirements.txt` and execute:
+
+`streamlit run app.py`
+
+Automated tests can be executed using:
+
+`PYTHONPATH=. pytest`
+
+The system follows a modular structure, separating UI (`app.py`), domain logic (`quiz.py`, `question.py`), validation utilities, and persistence (`data_manager.py`). This structure allows logic components to be tested independently from the interface layer, improving maintainability and reliability.
+Evaluation
+
 ## Evaluation
+
+Overall, the project successfully met the majority of the defined functional and non-functional requirements. Core functionality — including question loading, controlled progression, scoring logic, input validation, feedback rendering, and persistent result storage — was implemented as intended. The modular architecture supported clean separation of concerns and enabled effective unit testing of business logic.
+
+However, Functional Requirements FR11 and FR12 were not fully implemented. While the application provides structured completion feedback and result storage, it does not yet include extended reporting or advanced visual elements that were originally considered. These features were deprioritised to ensure stability and correctness of core functionality within the available development timeframe.
+
+Additionally, while the Streamlit interface delivers the required functionality, the final UI does not fully reflect the visual refinement presented in the design prototypes. Layout control limitations within Streamlit and time constraints meant that spacing, visual hierarchy, and styling were not implemented to the same standard as the design mock-ups. With additional time, the interface could be improved through custom styling, layout restructuring, or migration to a more flexible frontend framework.
+
+Despite these limitations, the final application meets its primary objective: delivering a structured, reliable internal training tool with validated input, deterministic scoring, and persistent result storage.
 
 
 
