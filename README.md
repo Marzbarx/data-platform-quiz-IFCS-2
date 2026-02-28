@@ -84,7 +84,7 @@ Participants who achieve 70% or above are shown the Pass screen. It mirrors the 
 | ID   | Requirement |
 |------|-------------|
 | NFR1 | The application should load and run within a reasonable time (≤ 2 seconds for screen transitions) to support a smooth user experience. |
-| NFR2 | TThe application should be intuitive and easy to navigate without requiring training or documentation. |
+| NFR2 | The application should be intuitive and easy to navigate without requiring training or documentation. |
 | NFR3 | The UI should adhere to a clean, professional design aligned with IBM brand guidelines where possible. |
 | NFR4 | The application must ensure that all validation logic is deterministic and testable via unit tests. |
 | NFR5 | The system should store results in a CSV format that is portable, human‑readable, and compatible with Excel. |
